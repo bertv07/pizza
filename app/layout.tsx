@@ -20,8 +20,28 @@ export const metadata: Metadata = {
   description: "Las mejores pizzas artesanales hechas con ingredientes frescos y de calidad.",
   icons: {
     icon: [
-      { url: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any', type: 'image/x-icon' },
+      { 
+        url: '/favicon.ico',
+        type: 'image/x-icon',
+        sizes: 'any',
+      },
+      {
+        url: '/favicon-16x16.png',
+        type: 'image/png',
+        sizes: '16x16',
+      },
+      {
+        url: '/favicon-32x32.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+    ],
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
     ],
   },
 };
