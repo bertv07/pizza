@@ -326,9 +326,15 @@ export function Header() {
                         Mi Perfil
                       </MenuLink>
                       <button
-                        onClick={() => {
-                          signOut()
-                          setIsMenuOpen(false)
+                        onClick={async () => {
+                          try {
+                            await signOut()
+                            // Cerrar el menú después de que se complete el cierre de sesión
+                            setIsMenuOpen(false)
+                          } catch (error) {
+                            console.error("Error al cerrar sesión:", error)
+                            // Opcional: Mostrar un mensaje de error al usuario
+                          }
                         }}
                         className="w-full flex items-center px-4 py-3 text-sm rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                       >

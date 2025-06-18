@@ -25,6 +25,8 @@ const categories = [
 ]
 
 export default function MenuPage() {
+  // Usamos useRef para rastrear si ya se cargaron los productos
+  const loadedRef = useRef(false);
   const [products, setProducts] = useState<Product[]>([])
   const [currentCategory, setCurrentCategory] = useState("pizza")
   const [isOpen, setIsOpen] = useState(false)
@@ -49,8 +51,20 @@ export default function MenuPage() {
   }, [])
 
   const loadProducts = useCallback(async () => {
+    // Si ya se cargaron los productos, no hacer nada
+    if (loadedRef.current) return;
+    
+    let isMounted = true;
+    
     try {
-      const { data, error } = await supabase.from("products").select("*").eq("available", true).order("name")
+      console.log("Cargando productos...");
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("available", true)
+        .order("name");
+
+      if (!isMounted) return;
 
       if (error) {
         if (error.code === "42P01") {
@@ -61,17 +75,41 @@ export default function MenuPage() {
         }
         throw error
       }
-      setProducts(data || [])
+      
+      // Usar Set para eliminar duplicados por ID
+      const uniqueProducts = Array.from(new Map(
+        (data || []).map(item => [item.id, item])
+      ).values());
+      
+      setProducts(uniqueProducts);
+      loadedRef.current = true; // Marcar como cargado
+      
     } catch (error) {
-      console.error("Error loading products:", error)
-      setProducts(getFallbackProducts())
+      console.error("Error loading products:", error);
+      if (isMounted) {
+        setProducts(getFallbackProducts());
+        loadedRef.current = true; // Marcar como cargado incluso en caso de error
+      }
     } finally {
-      setLoading(false)
+      if (isMounted) {
+        setLoading(false);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [])
 
   useEffect(() => {
-    loadProducts()
+    // Usar un timeout para asegurar que solo se ejecute una vez
+    const timer = setTimeout(() => {
+      loadProducts();
+    }, 100);
+    
+    return () => {
+      clearTimeout(timer);
+    };
   }, [loadProducts])
 
 

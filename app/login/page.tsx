@@ -4,7 +4,6 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
@@ -12,21 +11,27 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
-  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    const result = await signIn(email, password)
+    try {
+      const result = await signIn(email, password)
 
-    if (result.success) {
-      router.push("/")
-    } else {
-      alert("Error: " + result.error)
+      if (result.success) {
+        // Forzar una recarga completa para asegurar que todos los componentes
+        // se actualicen con el nuevo estado de autenticación
+        window.location.href = "/"
+      } else {
+        alert("Error: " + (result.error || "Error desconocido al iniciar sesión"))
+      }
+    } catch (error) {
+      console.error("Error en el inicio de sesión:", error)
+      alert("Ocurrió un error al intentar iniciar sesión. Por favor, inténtalo de nuevo.")
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (

@@ -120,9 +120,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      
+      // Forzar actualización del estado
+      setUser(null)
+      setSession(null)
+      
+      // Redirigir a la página de inicio
       router.push("/")
+      router.refresh() // Forzar recarga de la página para asegurar la limpieza
     } catch (error) {
       console.error("Error en logout:", error)
+      throw error // Relanzar el error para que el componente lo maneje
     }
   }
 
